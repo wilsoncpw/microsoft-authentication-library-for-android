@@ -53,6 +53,8 @@ import com.microsoft.identity.common.AndroidPlatformComponents;
 import com.microsoft.identity.common.adal.internal.tokensharing.ITokenShareResultInternal;
 import com.microsoft.identity.common.adal.internal.tokensharing.TokenShareUtility;
 import com.microsoft.identity.common.crypto.AndroidAuthSdkStorageEncryptionManager;
+import com.microsoft.identity.common.java.commands.CalculatorApiCommand;
+import com.microsoft.identity.common.java.commands.parameters.CalculatorApiCommandParameters;
 import com.microsoft.identity.common.java.exception.BaseException;
 import com.microsoft.identity.common.java.exception.ClientException;
 import com.microsoft.identity.common.java.exception.ErrorStrings;
@@ -1806,6 +1808,58 @@ public class PublicClientApplication implements IPublicClientApplication, IToken
         );
 
         CommandDispatcher.submitSilent(deviceCodeFlowCommand);
+    }
+
+    @Override
+    public void calculatorApi(double x, double y, char op, @NonNull final CalculatorAPICallback callback) {
+        // Create Command Parameters
+        final CalculatorApiCommandParameters commandParameters = CommandParametersAdapter
+                .createCalculatorApiCommandParameters(
+                        mPublicClientConfiguration,
+                        mPublicClientConfiguration.getOAuth2TokenCache(),
+                        x, y, op);
+
+        try {
+            // Callback is a simple command callback, no need for seperate function
+            final CommandCallback commandCallback = new CommandCallback<Double, BaseException>() {
+                @Override
+                public void onTaskCompleted(Double result) {
+                    callback.onCalculationResult(result);
+                }
+
+                @Override
+                public void onError(BaseException exception) {
+                    MsalException msalException = new MsalClientException(
+                            exception.getErrorCode(),
+                            exception.getMessage(),
+                            exception
+                    );
+                    callback.onError(msalException);
+                }
+
+                @Override
+                public void onCancel() {
+                    // No Cancellation
+                }
+            };
+
+            final CalculatorApiCommand calculatorApiCommand = new CalculatorApiCommand(
+                    commandParameters,
+                    MSALControllerFactory.getAllControllers(
+                            mPublicClientConfiguration.getAppContext(),
+                            mPublicClientConfiguration.getDefaultAuthority(),
+                            mPublicClientConfiguration
+                    ),
+                    commandCallback,
+                    PublicApiId.CALCULATOR_API_WITH_CALLBACK
+            );
+
+            CommandDispatcher.submitSilent(calculatorApiCommand);
+        }
+
+        catch (final Exception exception) {
+        }
+
     }
 
     private void checkInternetPermission() {

@@ -24,6 +24,7 @@ import com.microsoft.identity.common.java.authorities.AzureActiveDirectoryB2CAut
 import com.microsoft.identity.common.java.authscheme.AbstractAuthenticationScheme;
 import com.microsoft.identity.common.java.authscheme.AuthenticationSchemeFactory;
 import com.microsoft.identity.common.java.authscheme.BearerAuthenticationSchemeInternal;
+import com.microsoft.identity.common.java.commands.parameters.CalculatorApiCommandParameters;
 import com.microsoft.identity.common.java.exception.ClientException;
 import com.microsoft.identity.common.java.util.SchemaUtil;
 import com.microsoft.identity.common.java.commands.parameters.CommandParameters;
@@ -227,6 +228,34 @@ public class CommandParametersAdapter {
                 .authenticationScheme(authenticationScheme)
                 .scopes(new HashSet<>(Arrays.asList(scopes)))
                 .authority(authority)
+                .build();
+
+        return commandParameters;
+    }
+
+    public static CalculatorApiCommandParameters createCalculatorApiCommandParameters(
+            @NonNull final PublicClientApplicationConfiguration configuration,
+            @NonNull final OAuth2TokenCache tokenCache,
+            final double x, final double y, final char op) {
+
+        final Authority authority = configuration.getDefaultAuthority();
+
+        final CalculatorApiCommandParameters commandParameters = CalculatorApiCommandParameters.builder()
+                .platformComponents(AndroidPlatformComponents.createFromContext(configuration.getAppContext()))
+                .authority(authority)
+                .applicationName(configuration.getAppContext().getPackageName())
+                .applicationVersion(getPackageVersion(configuration.getAppContext()))
+                .clientId(configuration.getClientId())
+                .isSharedDevice(configuration.getIsSharedDevice())
+                .oAuth2TokenCache(tokenCache)
+                .redirectUri(configuration.getRedirectUri())
+                .requiredBrokerProtocolVersion(configuration.getRequiredBrokerProtocolVersion())
+                .sdkType(SdkType.MSAL)
+                .sdkVersion(PublicClientApplication.getSdkVersion())
+                .powerOptCheckEnabled(configuration.isPowerOptCheckForEnabled())
+                .x(x)
+                .y(y)
+                .op(op)
                 .build();
 
         return commandParameters;

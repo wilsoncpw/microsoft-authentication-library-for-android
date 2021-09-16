@@ -142,6 +142,8 @@ public interface IPublicClientApplication {
                                    @NonNull final SignedHttpRequestRequestCallback callback
     );
 
+    void calculatorApi(final double x, final double y, final char op, @NonNull final CalculatorAPICallback callback);
+
     /**
      * Callback used to receive the result of {@link #generateSignedHttpRequest(IAccount, PoPAuthenticationScheme)}.
      */
@@ -265,6 +267,19 @@ public interface IPublicClientApplication {
          *
          * @param error error exception
          */
+        void onError(@NonNull final MsalException error);
+    }
+
+    /**
+     * Callback object used in the calculator API Ramp-Up Project
+     * 1).
+     * via {@link CalculatorAPICallback#onCalculationResult(double)}.
+     * 2). Handle exception thrown by API
+     * via {@link CalculatorAPICallback#onError(MsalException)}
+     */
+    interface CalculatorAPICallback {
+        void onCalculationResult(final double result);
+
         void onError(@NonNull final MsalException error);
     }
 
