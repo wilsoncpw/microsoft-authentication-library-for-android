@@ -4,6 +4,10 @@ project.ext.vstsPassword = System.getenv("ENV_VSTS_MVN_ANDROID_MSAL_ACCESSTOKEN"
 
 buildscript {
     apply from: rootProject.file("gradle/versions.gradle")
+    ext {
+        distCommon4jVersion = '13.1.0'
+        distCommonVersion = '16.1.0'
+    }
 
     repositories {
         google()
